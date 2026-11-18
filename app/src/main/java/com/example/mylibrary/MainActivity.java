@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     FirebaseFirestore db;
-    EditText etBook, etAuthor, etPages;
+    EditText etBook, etAuthor, etPages, etRead;
     TextView tvStatus;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         etBook = findViewById(R.id.etBook);
         etAuthor = findViewById(R.id.etAuthor);
         etPages = findViewById(R.id.etPages);
+        etRead = findViewById(R.id.etRead);
         tvStatus = findViewById(R.id.tvStatus);
         Button btnSave = findViewById(R.id.btnSave);
         Button btnLoad = findViewById(R.id.btnLoad);
@@ -59,10 +60,25 @@ public class MainActivity extends AppCompatActivity {
                     etPages.setError("יש למלא מספר עמודים");
                     return;
                 }
+                if (etRead.getText().toString().trim().isEmpty()) {
+                    etRead.setError("יש למלא עמודים שקראתי");
+                    return;
+                }
+                int pages = Integer.parseInt(etPages.getText().toString().trim());
+                int pagesRead = Integer.parseInt(etRead.getText().toString().trim());
+                if (pages <= 0) {
+                    etPages.setError("מספר עמודים חייב להיות גדול מ-0");
+                    return;
+                }
+                if (pagesRead < 0 || pagesRead > pages) {
+                    etRead.setError("מספר בין 0 ל-" + pages);
+                    return;
+                }
                 Map<String, Object> book = new HashMap<>();
                 book.put("title", etBook.getText().toString());
                 book.put("author", etAuthor.getText().toString());
-                book.put("pages", Integer.parseInt(etPages.getText().toString()));
+                book.put("pages", pages);
+                book.put("pagesRead", pagesRead);
 
                 tvStatus.setText("שומר...");
 
@@ -70,7 +86,8 @@ public class MainActivity extends AppCompatActivity {
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
-                                tvStatus.setText("נשמר בענן");
+                                int percent = (pagesRead * 100) / pages;
+                                tvStatus.setText("קראת " + pagesRead + " מתוך " + pages + " עמודים (" + percent + "%)");
                                 Toast.makeText(MainActivity.this, "הספר נשמר", Toast.LENGTH_SHORT).show();
                             }
                         })
@@ -99,12 +116,23 @@ public class MainActivity extends AppCompatActivity {
                                 etBook.setText(doc.getString("title"));
                                 etAuthor.setText(doc.getString("author"));
                                 Long pages = doc.getLong("pages");
+                                Long pagesRead = doc.getLong("pagesRead");
                                 if (pages != null) {
                                     etPages.setText(String.valueOf(pages));
                                 } else {
                                     etPages.setText("");
                                 }
-                                tvStatus.setText("נטען מהענן");
+                                if (pagesRead != null) {
+                                    etRead.setText(String.valueOf(pagesRead));
+                                } else {
+                                    etRead.setText("");
+                                }
+                                if (pages != null && pagesRead != null && pages > 0) {
+                                    long percent = (pagesRead * 100) / pages;
+                                    tvStatus.setText("קראת " + pagesRead + " מתוך " + pages + " עמודים (" + percent + "%)");
+                                } else {
+                                    tvStatus.setText("נטען מהענן");
+                                }
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
