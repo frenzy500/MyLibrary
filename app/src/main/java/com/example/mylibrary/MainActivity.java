@@ -19,9 +19,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class MainActivity extends AppCompatActivity {
     FirebaseFirestore db;
     EditText etBook, etAuthor, etPages, etRead;
@@ -74,11 +71,12 @@ public class MainActivity extends AppCompatActivity {
                     etRead.setError("מספר בין 0 ל-" + pages);
                     return;
                 }
-                Map<String, Object> book = new HashMap<>();
-                book.put("title", etBook.getText().toString());
-                book.put("author", etAuthor.getText().toString());
-                book.put("pages", pages);
-                book.put("pagesRead", pagesRead);
+                Book book = new Book(
+                        etBook.getText().toString(),
+                        etAuthor.getText().toString(),
+                        pages,
+                        pagesRead
+                );
 
                 tvStatus.setText("שומר...");
 
@@ -113,25 +111,18 @@ public class MainActivity extends AppCompatActivity {
                                     tvStatus.setText("עוד אין ספר שמור");
                                     return;
                                 }
-                                etBook.setText(doc.getString("title"));
-                                etAuthor.setText(doc.getString("author"));
-                                Long pages = doc.getLong("pages");
-                                Long pagesRead = doc.getLong("pagesRead");
-                                if (pages != null) {
-                                    etPages.setText(String.valueOf(pages));
-                                } else {
-                                    etPages.setText("");
-                                }
-                                if (pagesRead != null) {
-                                    etRead.setText(String.valueOf(pagesRead));
-                                } else {
-                                    etRead.setText("");
-                                }
-                                if (pages != null && pagesRead != null && pages > 0) {
-                                    long percent = (pagesRead * 100) / pages;
-                                    tvStatus.setText("קראת " + pagesRead + " מתוך " + pages + " עמודים (" + percent + "%)");
-                                } else {
-                                    tvStatus.setText("נטען מהענן");
+                                Book book = doc.toObject(Book.class);
+                                if (book != null) {
+                                    etBook.setText(book.title);
+                                    etAuthor.setText(book.author);
+                                    etPages.setText(String.valueOf(book.pages));
+                                    etRead.setText(String.valueOf(book.pagesRead));
+                                    if (book.pages > 0) {
+                                        int percent = (book.pagesRead * 100) / book.pages;
+                                        tvStatus.setText("קראת " + book.pagesRead + " מתוך " + book.pages + " עמודים (" + percent + "%)");
+                                    } else {
+                                        tvStatus.setText("נטען מהענן");
+                                    }
                                 }
                             }
                         })
