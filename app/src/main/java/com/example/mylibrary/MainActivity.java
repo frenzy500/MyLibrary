@@ -1,5 +1,6 @@
 package com.example.mylibrary;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -9,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         tvStatus = findViewById(R.id.tvStatus);
         Button btnSave = findViewById(R.id.btnSave);
         Button btnLoad = findViewById(R.id.btnLoad);
+        Button btnDelete = findViewById(R.id.btnDelete);
 
         btnSave.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -132,6 +135,40 @@ public class MainActivity extends AppCompatActivity {
                                 tvStatus.setText("הטעינה נכשלה: " + e.getMessage());
                             }
                         });
+            }
+        });
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("מחיקת ספר")
+                        .setMessage("האם למחוק את הספר מהענן?")
+                        .setPositiveButton("כן", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                tvStatus.setText("מוחק...");
+                                db.collection("books").document("current").delete()
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+                                                etBook.setText("");
+                                                etAuthor.setText("");
+                                                etPages.setText("");
+                                                etRead.setText("");
+                                                tvStatus.setText("הספר נמחק מהענן");
+                                                Toast.makeText(MainActivity.this, "הספר נמחק", Toast.LENGTH_SHORT).show();
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                tvStatus.setText("המחיקה נכשלה: " + e.getMessage());
+                                            }
+                                        });
+                            }
+                        })
+                        .setNegativeButton("לא", null)
+                        .show();
             }
         });
     }
