@@ -1,6 +1,7 @@
 package com.example.mylibrary;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         Button btnSave = findViewById(R.id.btnSave);
         Button btnLoad = findViewById(R.id.btnLoad);
         Button btnDelete = findViewById(R.id.btnDelete);
+        Button btnLogout = findViewById(R.id.btnLogout);
 
         btnSave.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -139,6 +142,15 @@ public class MainActivity extends AppCompatActivity {
                         })
                         .setNegativeButton("לא", null)
                         .show();
+            }
+        });
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
         loadBook();
