@@ -23,7 +23,6 @@ public class LoginActivity extends AppCompatActivity {
     FirebaseAuth auth;
     EditText etEmail, etPassword;
     TextView tvMessage;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

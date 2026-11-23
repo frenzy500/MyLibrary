@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseFirestore db;
     EditText etBook, etAuthor, etPages, etRead;
     TextView tvStatus;
+    String uid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
         db = FirebaseFirestore.getInstance();
+        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         etBook = findViewById(R.id.etBook);
         etAuthor = findViewById(R.id.etAuthor);
         etPages = findViewById(R.id.etPages);
@@ -86,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
                 tvStatus.setText("שומר...");
 
-                db.collection("books").document("current").set(book)
+                db.collection("users").document(uid).set(book)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
@@ -120,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 tvStatus.setText("מוחק...");
-                                db.collection("books").document("current").delete()
+                                db.collection("users").document(uid).delete()
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void unused) {
@@ -157,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
     }
     void loadBook() {
         tvStatus.setText("טוען...");
-        db.collection("books").document("current").get()
+        db.collection("users").document(uid).get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
 
