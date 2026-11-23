@@ -104,37 +104,7 @@ public class MainActivity extends AppCompatActivity {
         btnLoad.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                tvStatus.setText("טוען...");
-                db.collection("books").document("current").get()
-                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                            @Override
-
-                            public void onSuccess(DocumentSnapshot doc) {
-                                if (!doc.exists()) {
-                                    tvStatus.setText("עוד אין ספר שמור");
-                                    return;
-                                }
-                                Book book = doc.toObject(Book.class);
-                                if (book != null) {
-                                    etBook.setText(book.title);
-                                    etAuthor.setText(book.author);
-                                    etPages.setText(String.valueOf(book.pages));
-                                    etRead.setText(String.valueOf(book.pagesRead));
-                                    if (book.pages > 0) {
-                                        int percent = (book.pagesRead * 100) / book.pages;
-                                        tvStatus.setText("קראת " + book.pagesRead + " מתוך " + book.pages + " עמודים (" + percent + "%)");
-                                    } else {
-                                        tvStatus.setText("נטען מהענן");
-                                    }
-                                }
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                tvStatus.setText("הטעינה נכשלה: " + e.getMessage());
-                            }
-                        });
+                loadBook();
             }
         });
         btnDelete.setOnClickListener(new View.OnClickListener() {
@@ -171,5 +141,39 @@ public class MainActivity extends AppCompatActivity {
                         .show();
             }
         });
+        loadBook();
+    }
+    void loadBook() {
+        tvStatus.setText("טוען...");
+        db.collection("books").document("current").get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+
+                    public void onSuccess(DocumentSnapshot doc) {
+                        if (!doc.exists()) {
+                            tvStatus.setText("עוד אין ספר שמור");
+                            return;
+                        }
+                        Book book = doc.toObject(Book.class);
+                        if (book != null) {
+                            etBook.setText(book.title);
+                            etAuthor.setText(book.author);
+                            etPages.setText(String.valueOf(book.pages));
+                            etRead.setText(String.valueOf(book.pagesRead));
+                            if (book.pages > 0) {
+                                int percent = (book.pagesRead * 100) / book.pages;
+                                tvStatus.setText("קראת " + book.pagesRead + " מתוך " + book.pages + " עמודים (" + percent + "%)");
+                            } else {
+                                tvStatus.setText("נטען מהענן");
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        tvStatus.setText("הטעינה נכשלה: " + e.getMessage());
+                    }
+                });
     }
 }
