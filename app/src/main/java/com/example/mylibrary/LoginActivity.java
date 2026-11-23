@@ -18,10 +18,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class LoginActivity extends AppCompatActivity {
     FirebaseAuth auth;
-    EditText etEmail, etPassword;
+    EditText etName, etEmail, etPassword;
     TextView tvMessage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
         auth = FirebaseAuth.getInstance();
+        etName = findViewById(R.id.etName);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         tvMessage = findViewById(R.id.tvMessage);
@@ -46,8 +48,13 @@ public class LoginActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String name = etName.getText().toString().trim();
                 String email = etEmail.getText().toString().trim();
                 String password = etPassword.getText().toString();
+                if (name.isEmpty()) {
+                    etName.setError("חובה למלא שם");
+                    return;
+                }
                 if (email.isEmpty()) {
                     etEmail.setError("חובה למלא אימייל");
                     return;
@@ -63,7 +70,22 @@ public class LoginActivity extends AppCompatActivity {
                         .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                             @Override
                             public void onSuccess(AuthResult result) {
-                                goToMain();
+                                UserProfileChangeRequest profile = new UserProfileChangeRequest.Builder()
+                                        .setDisplayName(name)
+                                        .build();
+                                result.getUser().updateProfile(profile)
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+                                                goToMain();
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                tvMessage.setText("שמירת השם נכשלה: " + e.getMessage());
+                                            }
+                                        });
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {

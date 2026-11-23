@@ -20,8 +20,13 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     FirebaseFirestore db;
@@ -39,10 +44,21 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
         db = FirebaseFirestore.getInstance();
-        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        uid = user.getUid();
+        TextView tvGreeting = findViewById(R.id.tvGreeting);
+        String name = user.getDisplayName();
+        if (name != null && !name.isEmpty()) {
+            tvGreeting.setText("שלום, " + name);
+        }
         TextView tvUser = findViewById(R.id.tvUser);
-        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-        tvUser.setText("מחובר כ-" + email);
+        tvUser.setText("מחובר כ-" + user.getEmail());
+        TextView tvCreatedAt = findViewById(R.id.tvCreatedAt);
+        if (user.getMetadata() != null) {
+            long creationTime = user.getMetadata().getCreationTimestamp();
+            String date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date(creationTime));
+            tvCreatedAt.setText("נרשמת בתאריך: " + date);
+        }
         etBook = findViewById(R.id.etBook);
         etAuthor = findViewById(R.id.etAuthor);
         etPages = findViewById(R.id.etPages);
