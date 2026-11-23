@@ -16,6 +16,14 @@
         android:textAlignment="center"
         android:text="my libary" />
 
+    <TextView
+        android:id="@+id/tvUser"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textAlignment="center"
+        android:text="" />
+
     <EditText
         android:id="@+id/etBook"
         android:layout_width="match_parent"

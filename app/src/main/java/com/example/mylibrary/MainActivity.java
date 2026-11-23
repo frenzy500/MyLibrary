@@ -40,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
         });
         db = FirebaseFirestore.getInstance();
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        TextView tvUser = findViewById(R.id.tvUser);
+        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        tvUser.setText("מחובר כ-" + email);
         etBook = findViewById(R.id.etBook);
         etAuthor = findViewById(R.id.etAuthor);
         etPages = findViewById(R.id.etPages);
